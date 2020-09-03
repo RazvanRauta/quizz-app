@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState } from "react";
+import React, { MouseEvent, useState } from 'react'
 import {
   ChakraProvider,
   Box,
@@ -7,68 +7,69 @@ import {
   Text,
   Spinner,
   Flex,
-} from "@chakra-ui/core";
-import theme from "./theme";
-import { ColorModeSwitcher } from "./ColorModeSwitcher";
-import { Logo } from "./Logo";
-import QuestionCard from "./components/QuestionCard";
-import { fetchQuizQuestions, Difficulty, QuestionsState } from "./API";
+  Code,
+} from '@chakra-ui/core'
+import theme from './theme'
+import { ColorModeSwitcher } from './ColorModeSwitcher'
+import { Logo } from './Logo'
+import QuestionCard from './components/QuestionCard'
+import { fetchQuizQuestions, Difficulty, QuestionsState } from './API'
 
 export type AnswerObject = {
-  question: string;
-  answer: string;
-  correct: boolean;
-  correctAnswer: string;
-};
+  question: string
+  answer: string
+  correct: boolean
+  correctAnswer: string
+}
 
-const TOTAL_QUESTIONS = 10;
+const TOTAL_QUESTIONS = 10
 
 const App = () => {
-  const [loading, setLoading] = useState(false);
-  const [questions, setQuestions] = useState<QuestionsState[]>([]);
-  const [number, setNumber] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
-  const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(true);
+  const [loading, setLoading] = useState(false)
+  const [questions, setQuestions] = useState<QuestionsState[]>([])
+  const [number, setNumber] = useState(0)
+  const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([])
+  const [score, setScore] = useState(0)
+  const [gameOver, setGameOver] = useState(true)
 
   const startTrivia = async () => {
-    setLoading(true);
-    setGameOver(false);
+    setLoading(true)
+    setGameOver(false)
     const newQuestions = await fetchQuizQuestions(
       TOTAL_QUESTIONS,
       Difficulty.EASY
-    );
+    )
 
-    setQuestions(newQuestions);
-    setScore(0);
-    setUserAnswers([]);
-    setNumber(0);
-    setLoading(false);
-  };
+    setQuestions(newQuestions)
+    setScore(0)
+    setUserAnswers([])
+    setNumber(0)
+    setLoading(false)
+  }
 
   const checkAnswer = (e: MouseEvent<HTMLButtonElement>) => {
     if (!gameOver) {
-      const answer = e.currentTarget.value;
-      const correct = questions[number].correct_answer === answer;
-      if (correct) setScore((prev) => prev + 1);
+      const answer = e.currentTarget.value
+      const correct = questions[number].correct_answer === answer
+      if (correct) setScore((prev) => prev + 1)
       const answerObj = {
         question: questions[number].question,
         answer,
         correct,
         correctAnswer: questions[number].correct_answer,
-      };
-      setUserAnswers((prev) => [...prev, answerObj]);
+      }
+      setUserAnswers((prev) => [...prev, answerObj])
     }
-  };
+  }
 
   const nextQuestion = () => {
-    const nextQuestion = number + 1;
+    const nextQuestion = number + 1
     if (nextQuestion === TOTAL_QUESTIONS) {
-      setGameOver(true);
+      setGameOver(true)
     } else {
-      setNumber(nextQuestion);
+      setNumber(nextQuestion)
     }
-  };
+  }
 
   return (
     <ChakraProvider theme={theme} resetCSS>
@@ -97,21 +98,23 @@ const App = () => {
           minH="75vh"
           direction="column"
           p={3}
-          justifyContent="center"
+          justifyContent="flex-start"
           alignItems="center"
           maxWidth={800}
           mx="auto"
+          position="relative"
         >
           <Heading
-            as={"h1"}
-            backgroundImage={"linear-gradient(180deg,#fff,#87f1ff)"}
+            as={'h1'}
+            backgroundImage={'linear-gradient(180deg,#fff,#87f1ff)'}
             backgroundSize="100%"
+            rounded="full"
             css={{
-              backgroundClip: "text",
-              filter: "drop-shadow(2px 2px #0085a3)",
+              backgroundClip: 'text',
+              filter: 'drop-shadow(2px 2px #0085a3)',
             }}
-            margin={"20px"}
-            px={4}
+            margin={'20px'}
+            px={6}
           >
             React Quiz
           </Heading>
@@ -119,16 +122,20 @@ const App = () => {
             <Button
               maxWidth="max-content"
               onClick={startTrivia}
+              backgroundColor="cyan.300"
+              position="absolute"
+              top={200}
+              zIndex={10}
+              fontSize="l"
               _focus={{
-                boxShadow: "none",
+                boxShadow: 'none',
               }}
             >
-              Start
+              Start Game
             </Button>
           ) : null}
-          {!gameOver && <Text fontSize={"2rem"}>Score:{score}</Text>}
           {loading && <Spinner size="xl" color="teal.500" />}
-          {!loading && !gameOver && (
+          {!loading && !gameOver && userAnswers.length !== TOTAL_QUESTIONS && (
             <QuestionCard
               questionNumber={number + 1}
               totalQuestions={TOTAL_QUESTIONS}
@@ -136,7 +143,31 @@ const App = () => {
               answers={questions[number].answers}
               userAnswer={userAnswers ? userAnswers[number] : undefined}
               callback={checkAnswer}
+              score={score}
             />
+          )}
+          {userAnswers.length === TOTAL_QUESTIONS && (
+            <Flex
+              direction="column"
+              backgroundColor="gray.50"
+              rounded="10px"
+              marginTop="180px"
+              p={5}
+            >
+              <Text fontWeight="bold">Game Over</Text>
+              <Text>
+                Final score:
+                <Code
+                  ml={2}
+                  rounded="full"
+                  fontWeight="bold"
+                  fontSize="xl"
+                  color="purple.800"
+                >
+                  {score}
+                </Code>
+              </Text>
+            </Flex>
           )}
           {!gameOver &&
             !loading &&
@@ -145,8 +176,10 @@ const App = () => {
               <Button
                 maxWidth="max-content"
                 onClick={nextQuestion}
+                mt={8}
+                backgroundColor="cyan.500"
                 _focus={{
-                  boxShadow: "none",
+                  boxShadow: 'none',
                 }}
               >
                 Next Question
@@ -155,7 +188,7 @@ const App = () => {
         </Flex>
       </Box>
     </ChakraProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App
