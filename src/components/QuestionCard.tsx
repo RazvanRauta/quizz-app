@@ -24,6 +24,7 @@ const QuestionCard: React.FC<Props> = ({
 }) => {
   return (
     <Box
+      role="QuestionCard"
       backgroundColor="gray.50"
       backgroundImage={useColorModeValue(
         '',
