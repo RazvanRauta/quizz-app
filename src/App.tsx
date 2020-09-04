@@ -146,7 +146,9 @@ const App = () => {
                 Start Game
               </Button>
             ) : null}
-            {loading && <Spinner mt={'200px'} size="xl" color="teal.500" />}
+            {loading && (
+              <Spinner role="spinner" mt={'200px'} size="xl" color="teal.500" />
+            )}
             {!loading &&
               !gameOver &&
               userAnswers.length !== TOTAL_QUESTIONS && (
