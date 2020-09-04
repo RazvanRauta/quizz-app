@@ -1,6 +1,7 @@
 import React, { MouseEvent } from 'react'
-import { Box, Text, Button, Grid } from '@chakra-ui/core'
+import { Box, Text, Button, Grid, useColorModeValue } from '@chakra-ui/core'
 import { AnswerObject } from '../App'
+import ConfettiCanvas from 'react-confetti-canvas'
 
 interface Props {
   question: string
@@ -22,12 +23,31 @@ const QuestionCard: React.FC<Props> = ({
   score,
 }) => {
   return (
-    <Box backgroundColor="gray.50" rounded="10px" p={10} position="relative">
+    <Box
+      backgroundColor="gray.50"
+      backgroundImage={useColorModeValue(
+        '',
+        'linear-gradient(45deg,#61045f,#aa076b)'
+      )}
+      rounded="10px"
+      p={10}
+      position="relative"
+      maxW={['100%', 'unset']}
+    >
+      {!!userAnswer && userAnswer.correct && (
+        <Box position="absolute" width="100%" height="100%" top={0} right={0}>
+          <ConfettiCanvas />
+        </Box>
+      )}
       <Text
         px={2}
         backgroundColor={'teal.100'}
         maxWidth="max-content"
         rounded="full"
+        backgroundImage={useColorModeValue(
+          '',
+          'linear-gradient(45deg, #41295a, #2f0743)'
+        )}
         position="absolute"
         left={4}
         top={4}
@@ -37,28 +57,34 @@ const QuestionCard: React.FC<Props> = ({
       <Text
         px={2}
         backgroundColor={'teal.100'}
+        backgroundImage={useColorModeValue(
+          '',
+          'linear-gradient(45deg, #41295a, #2f0743)'
+        )}
         maxWidth="max-content"
         rounded="full"
         position="absolute"
         right={4}
         top={4}
       >
-        Score:{score}
+        Score:&nbsp;{score}
       </Text>
       <Text
-        maxWidth="350px"
+        maxWidth="500px"
+        fontSize={['1.5rem', '2rem']}
         mt={10}
         pb={4}
         mx="auto"
         dangerouslySetInnerHTML={{ __html: question }}
       ></Text>
       <Grid
-        templateColumns={'1fr 1fr'}
+        templateColumns={['1fr', '1fr 1fr']}
         gap={6}
         width={'400px'}
         mx={'auto'}
         mt={10}
-        minWidth={'max-content'}
+        minWidth={['unset', 'max-content']}
+        maxWidth={['100%', 'unset']}
       >
         {answers.map((answer) => (
           <Box justifySelf="center" key={answer}>
@@ -94,14 +120,25 @@ const QuestionCard: React.FC<Props> = ({
                   ? 'red.200'
                   : ''
               }
+              _active={{
+                backgroundColor:
+                  !!userAnswer && userAnswer.correctAnswer === answer
+                    ? 'teal.200'
+                    : !!userAnswer && userAnswer.correctAnswer !== answer
+                    ? 'red.200'
+                    : '',
+              }}
               value={answer}
               pointerEvents={!!userAnswer ? 'none' : 'all'}
               onClick={callback}
+              whiteSpace="normal"
+              height="fit-content"
             >
               <Text
                 as="span"
                 overflowWrap="break-word"
                 wordBreak="break-word"
+                padding={2}
                 css={{
                   hyphens: 'auto',
                 }}
